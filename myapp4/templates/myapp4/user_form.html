@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>{{ message }}</h3>
+<form actions="" method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <input type="submit" vaalue="Отправить">
+</form>
+{% endblock %}
