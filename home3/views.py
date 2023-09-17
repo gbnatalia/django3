@@ -1,8 +1,10 @@
 import datetime
+
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
 from .models import Client, Product, Order
-
+from .forms import ProductForm, ImageForm
 
 def client(request):
     template_name = "home3\\list_items.html"
@@ -57,3 +59,43 @@ class ListClientProducts(TemplateView):
         context['orders'] = orders
         context['title'] = "Список заказов клиента"
         return context
+
+
+def change_product(request, pk):
+
+    product = Product.objects.filter(id=pk).first()
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.cleaned_data['image']
+            if isinstance(image, bool):
+                image = None
+            if image is not None:
+                fs = FileSystemStorage()
+                fs.save(image.name, image)
+            product.name = form.cleaned_data['name']
+            product.description = form.cleaned_data['description']
+            product.price = form.cleaned_data['price']
+            product.count = form.cleaned_data['count']
+            product.image = image
+            product.save()
+    else:
+        form = ProductForm(initial={'name': product.name, 'description': product.description,
+                                    'price': product.price, 'count': product.count, 'image': product.image})
+
+    return render(request, 'home3/change_product.html', {'form': form})
+
+
+def upload_image(request):
+    if request.method == 'POST':
+        form = ImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.cleaned_data['image']
+            fs = FileSystemStorage()
+            fs.save(image.name, image)
+    else:
+        form = ImageForm()
+    return render(request, 'home3/upload_image.html', {'form': form})
+
+
