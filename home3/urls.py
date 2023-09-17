@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from .views import OrderProductView, ListClientProducts
-from .views import client, product, order, add_product, upload_image, change_product
+from .views import client, product, order, upload_image, change_product
 
 urlpatterns = [
     path('client/', client, name='client'),
